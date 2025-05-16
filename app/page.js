@@ -5,11 +5,14 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+// Safe Supabase client initialization
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase =
+  typeof window !== "undefined" && supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
 
 const noMessages = [
   "  ",
@@ -135,7 +138,6 @@ function RejectedStep({ onPlease }) {
         className="w-full max-w-xs mb-4 rounded-lg object-contain"
         loading="lazy"
       />
-      {/* <p>I understand... 💔</p> */}
       <button
         onClick={onPlease}
         className="bg-rose-400 text-white px-8 py-3 rounded-2xl shadow hover:bg-rose-500 text-base"
@@ -155,6 +157,10 @@ export default function Home() {
   const [messageSending, setMessageSending] = useState(false);
 
   const logClick = async (buttonName, stepName) => {
+    if (!supabase) {
+      console.warn("Supabase not initialized");
+      return;
+    }
     const userAgent = navigator.userAgent;
     const { error } = await supabase.from("ashmit").insert([
       {
@@ -194,6 +200,10 @@ export default function Home() {
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
+    if (!supabase) {
+      alert("Supabase is not configured.");
+      return;
+    }
     setMessageSending(true);
 
     const { error } = await supabase.from("ashmit").insert([
