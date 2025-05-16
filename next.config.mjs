@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  basePath: '/<your-repo-name>',
-  images: {
-    unoptimized: true,
-  },
+  basePath: '/San', // Replace with your actual repository name
+  assetPrefix: '/San',
 };
 
-module.exports = nextConfig;
+export default nextConfig;
+
